@@ -5,8 +5,50 @@ MAXIMUM_LENGTH_OF_NUMBERS = 12
 operators = {'*': '*', '/': '/', '+': '+', '-': '-', '^': '**'}
 constants = ['pi', 'e']
 # Create classes for functions
+functions = []
 int_functions = {'gcd': 'gcd'}
 float_functions = {'abs': 'abs'}
+
+
+class Functions(object):
+    def __init__(self, references, function, num_of_arguments, req_int):
+        """
+        Initializes an Operator class
+        :param references: list of strings, accepted forms of referring to a function
+        :param function: string, function references are referring to
+        :param num_of_arguments: int, number of arguments taken by a function
+        :param req_int: boolean, True if a function requires arguments to be integers, False otherwise
+        """
+        self.references = references
+        self.function = function
+        self.num_of_arguments = num_of_arguments
+        self.req_int = req_int
+
+    def get_function(self, reference):
+        """
+        Checks if reference references to this function
+        :param reference: string
+        :return: function (str), number of arguments (int), does function require arguments to be integers (bool)
+        """
+        if reference in self.references:
+            return self.function, self.num_of_arguments, self.req_int
+        return None
+
+    def get_references(self):
+        return self.references
+
+
+def load_functions():
+    file = open('functions.txt', 'r')
+    for line in file:
+        if line[0] != '#':
+            line = line.split(':')
+            references = line[0].split(' ')
+            function = line[1]
+            num_of_arguments = int(line[2])
+            req_int = bool(line[3])
+            functions.append(Functions(references, function, num_of_arguments, req_int))
+    print('Calculating.py: ' + str(len(functions)) + ' functions loaded')
 
 
 def is_legal_float(string):
@@ -69,25 +111,30 @@ def get_input(user_input):
                 else:
                     raise OverflowError
             else:
-                function_not_found = True
-                for f in int_functions.keys():
-                    if element.find(f + '(') == 0 and element[-1] == ')':
-                        length_of_f = len(f)
-                        elements = element[length_of_f + 1:-1].split(',')
-                        if is_legal_int(elements[0]) and is_legal_int(elements[1]):
-                            expression += int_functions[f] + element[length_of_f:]
-                            function_not_found = False
+                first_parenthesis = element.find('(')
+                second_parenthesis = element.find(')')
+                if first_parenthesis != -1 and second_parenthesis != -1 and second_parenthesis == len(element) - 1:
+                    function_not_found = True
+                    for index in range(len(functions)):
+                        f = functions[index].get_function(element[:first_parenthesis])
+                        if f is not None:
+                            arguments = element[first_parenthesis + 1: second_parenthesis].split(',')
+                            if len(arguments) == f[1]:
+                                arguments_are_correct = True
+                                for argument in arguments:
+                                    if not (((not f[2]) and is_legal_float(argument)) or is_legal_int(argument)):
+                                        arguments_are_correct = False
+                                        break
+                                if arguments_are_correct:
+                                    expression += f[0] + element[first_parenthesis:]
+                                    function_not_found = False
+                            else:
+                                raise ArithmeticError
                             break
-                if function_not_found:
-                    for f in float_functions.keys():
-                        if element.find(f + '(') == 0 and element[-1] == ')':
-                            length_of_f = len(f)
-                            if is_legal_int(element[length_of_f + 1:-1]):
-                                expression += float_functions[f] + element[length_of_f:]
-                                function_not_found = False
-                                break
                     if function_not_found:
                         raise ValueError
+                else:
+                    raise ValueError
         elif element in operators.keys():
             expression += ' ' + operators[element]
             prev_is_operator = True

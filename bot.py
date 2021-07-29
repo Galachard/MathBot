@@ -16,10 +16,12 @@ client = discord.Client()
 
 # Commands
 command_symbol = '%'    # Symbol used before every bot command
+help_text = 'help'
 plot_text = 'plot'
 calc_text = 'calc'
 
 # Getting actual commands in every session of the bot
+help_com = command_symbol + help_text
 plot_com = command_symbol + plot_text + ' '
 calc_com = command_symbol + calc_text + ' '
 
@@ -32,10 +34,11 @@ calc_com = command_symbol + calc_text + ' '
 
 @client.event
 async def on_ready():
+    print('')
     print('Logged in as')
     print(client.user.name)
     print(client.user.id)
-    print('------')
+    print('')
 
 
 @client.event
@@ -44,7 +47,15 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if message.content.startswith('!hello'):
+    if message.content.startswith(help_com):
+        if message.content == help_com or message.content == help_com + ' ':
+            await message.channel.send('General help')  # General help and list of commands
+        else:   # Help with specific commands
+            message.content = message.content[len(help_com) + 1:]
+            if message.content == plot_text:
+                await message.channel.send('This is supposed to be helpful')
+
+    if message.content.startswith('%hello'):
         msg = 'Hello {0.author.mention}'.format(message)
         await message.channel.send(msg)
 
@@ -52,11 +63,6 @@ async def on_message(message):
         for i in range(20):
             await message.channel.send('????????????????????????????????????????????????????????????????????????????')
             time.sleep(0.6)
-
-    if message.content.startswith('%start_loop'):
-        for i in range(5):
-            await message.channel.send('Hello world!')
-            time.sleep(1)
 
     if message.content.startswith(plot_com):
         try:
@@ -78,9 +84,12 @@ async def on_message(message):
             await message.channel.send('Calculate command: Incorrect input!')
         except OverflowError:
             await message.channel.send('Calculate command: Calculated number is too big!')
+        except ArithmeticError:
+            await message.channel.send('Calculate command: Incorrect amount of arguments of a function!')
 
 
 def main():
+    calculating.load_functions()
     if not os.path.isdir('images'):
         print('"/images" not found. Creating a directory for images.')
         os.mkdir('./images')

@@ -1,0 +1,2 @@
+#References:function in python (eg. gcd):number of arguments it takes:does it require arguments to be integers (bool)
+gcd nwd:gcd:2:True
