@@ -81,6 +81,9 @@ async def on_message(message):
 
 
 def main():
+    if not os.path.isdir('images'):
+        print('"/images" not found. Creating a directory for images.')
+        os.mkdir('./images')
     client.run(TOKEN)
 
 
