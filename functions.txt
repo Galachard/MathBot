@@ -1,2 +1,7 @@
-#References:function in python (eg. gcd):number of arguments it takes:does it require arguments to be integers (bool)
-gcd nwd:gcd:2:True
+#References:function in python (e.g. gcd):number of arguments it takes:does it require arguments to be integers (bool):Description of the function:Example and what it returns
+gcd nwd:gcd:2:True:Returns the greatest common divisor of two integers:gcd(18,24),6
+abs:abs:1:False:Returns the absolute value of a number:abs(-2.5),2.5
+sin:sin:1:False:Returns the sine of an angle in radians:sin(0),0
+cos:cos:1:False:Returns the cosine of an angle in radians:cos(0),1
+tan tg:tan:1:False:Returns the tangent of an angle in radians:tan(0),0
+ctan ctg:1 / tan:1:False:Returns the cotangent of an angle in radians:ctan(3.14 * 1/2),0
