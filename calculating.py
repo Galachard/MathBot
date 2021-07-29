@@ -4,25 +4,27 @@ MAXIMUM_LENGTH_OF_NUMBERS = 12
 
 operators = {'*': '*', '/': '/', '+': '+', '-': '-', '^': '**'}
 constants = ['pi', 'e']
+
 # Create classes for functions
 functions = []
-int_functions = {'gcd': 'gcd'}
-float_functions = {'abs': 'abs'}
 
 
 class Functions(object):
-    def __init__(self, references, function, num_of_arguments, req_int):
+    def __init__(self, references, function, num_of_arguments, req_int, description, example):
         """
         Initializes an Operator class
         :param references: list of strings, accepted forms of referring to a function
         :param function: string, function references are referring to
         :param num_of_arguments: int, number of arguments taken by a function
         :param req_int: boolean, True if a function requires arguments to be integers, False otherwise
+        :param example: list containing example and what it returns
         """
         self.references = references
         self.function = function
         self.num_of_arguments = num_of_arguments
         self.req_int = req_int
+        self.description = description
+        self.example = example
 
     def get_function(self, reference):
         """
@@ -34,20 +36,33 @@ class Functions(object):
             return self.function, self.num_of_arguments, self.req_int
         return None
 
-    def get_references(self):
-        return self.references
+    def get_help(self, reference):
+        """
+        Checks if reference references to this function
+        :param reference: string
+        :return: function (str), description (str), copy of example (list)
+        """
+        if reference in self.references:
+            return self.function, self.description, self.example[:]
+        return None
 
 
 def load_functions():
     file = open('functions.txt', 'r')
     for line in file:
-        if line[0] != '#':
+        if line[0] != '#' and line != '':
             line = line.split(':')
             references = line[0].split(' ')
             function = line[1]
             num_of_arguments = int(line[2])
-            req_int = bool(line[3])
-            functions.append(Functions(references, function, num_of_arguments, req_int))
+            if line[3] == 'True':
+                req_int = True
+            else:
+                req_int = False
+            description = line[4]
+            example = line[5].split(',')
+            functions.append(Functions(references, function, num_of_arguments, req_int, description, example))
+    print('')
     print('Calculating.py: ' + str(len(functions)) + ' functions loaded')
 
 
